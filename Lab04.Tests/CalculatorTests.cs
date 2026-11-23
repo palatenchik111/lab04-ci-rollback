@@ -10,6 +10,6 @@ public class CalculatorTests
     {
         int actual = Calculator.Add(2, 2);
 
-        Assert.Equal(5, actual);
+        Assert.Equal(4, actual);
     }
 }
