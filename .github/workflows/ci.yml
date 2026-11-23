@@ -1,0 +1,44 @@
+name: Проверка проекта
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Получить исходный код
+        uses: actions/checkout@v6
+
+      - name: Установить .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Восстановить зависимости
+        run: dotnet restore Lab04.sln
+
+      - name: Собрать решение
+        run: dotnet build Lab04.sln --no-restore -c Release
+
+      - name: Выполнить тесты
+        run: >
+          dotnet test Lab04.sln
+          --no-build
+          -c Release
+          --logger "trx;LogFileName=tests.trx"
+          --results-directory TestResults
+
+      - name: Сохранить результаты тестирования
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+          if-no-files-found: ignore
+          retention-days: 7
